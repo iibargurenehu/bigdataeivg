@@ -1,0 +1,111 @@
+version: '3.3'
+services:
+  primary:
+    image: postgres:16-alpine3.23
+    container_name: pg-primary
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+      - primary_init:/docker-entrypoint-initdb.d
+    command:
+      - bash
+      - -lc
+      - |
+        set -eu
+
+        echo "Waiting for fetched primary init files..."
+        for i in $(seq 1 120); do
+          if [ -f /docker-entrypoint-initdb.d/01-replication.sql ] && \
+             [ -f /docker-entrypoint-initdb.d/02-hba.sh ] && \
+             [ -f /docker-entrypoint-initdb.d/10-init.sql ]; then
+            break
+          fi
+          sleep 1
+        done
+
+        chmod +x /docker-entrypoint-initdb.d/02-hba.sh || true
+
+        exec docker-entrypoint.sh postgres \
+          -c listen_addresses=* \
+          -c wal_level=replica \
+          -c max_wal_senders=10 \
+          -c max_replication_slots=10 \
+          -c hot_standby=on
+
+
+  replica1:
+    image: postgres:16-alpine3.23
+    container_name: pg-replica1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      REPLICA_DELAY: 8s
+    ports:
+      - "15432:5432"
+    volumes:
+      - replica1_data:/var/lib/postgresql/data
+      - replica_init:/replica-init
+    depends_on:
+      - primary
+    command:
+      - bash
+      - -lc
+      - |
+        set -eu
+
+        echo "Waiting for fetched replica script..."
+        for i in $(seq 1 120); do
+          if [ -f /replica-init/replica-entrypoint.sh ]; then
+            break
+          fi
+          sleep 1
+        done
+
+        chmod +x /replica-init/replica-entrypoint.sh || true
+        exec /replica-init/replica-entrypoint.sh
+
+  replica2:
+    image: postgres:16-alpine3.23
+    container_name: pg-replica2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      REPLICA_DELAY: 20s
+    ports:
+      - "25432:5432"
+    volumes:
+      - replica2_data:/var/lib/postgresql/data
+      - replica_init:/replica-init
+    depends_on:
+      - primary
+    command:
+      - bash
+      - -lc
+      - |
+        set -eu
+
+        echo "Waiting for fetched replica script..."
+        for i in $(seq 1 120); do
+          if [ -f /replica-init/replica-entrypoint.sh ]; then
+            break
+          fi
+          sleep 1
+        done
+
+        chmod +x /replica-init/replica-entrypoint.sh || true
+        exec /replica-init/replica-entrypoint.sh
+
+volumes:
+  primary_data:
+  replica1_data:
+  replica2_data:
+  primary_init:
+    external: true
+    name: postgresql-master-worker_primary_init
+  replica_init:
+    external: true
+    name: postgresql-master-worker_replica_init
