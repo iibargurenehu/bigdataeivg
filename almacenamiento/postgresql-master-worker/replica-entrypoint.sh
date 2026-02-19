@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-: "${REPLICA_DELAY:=8s}"
+: "${REPLICA_DELAY:=30s}"
 : "${POSTGRES_DB:=demo}"
 : "${POSTGRES_USER:=postgres}"
 
