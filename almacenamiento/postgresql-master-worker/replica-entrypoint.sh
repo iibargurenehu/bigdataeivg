@@ -3,7 +3,7 @@ set -eu
 
 : "${REPLICA_DELAY:=8s}"
 
-until pg_isready -h primary -U postgres -d appdb; do
+until pg_isready -h primary -U postgres -d demo; do
   sleep 1
 done
 
