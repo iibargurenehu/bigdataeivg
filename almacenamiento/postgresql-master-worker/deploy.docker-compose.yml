@@ -6,6 +6,8 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      TZ: Europe/Madrid
+      PGTZ: Europe/Madrid
     ports:
       - "5432:5432"
     volumes:
@@ -27,8 +29,6 @@ services:
           -c hot_standby=on
           -c log_min_messages=info
           -c log_replication_commands=on
-          -c log_connections=on
-          -c log_min_messages=info
 
 
   replica1:
@@ -38,6 +38,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       REPLICA_DELAY: 8s
+      TZ: Europe/Madrid
+      PGTZ: Europe/Madrid
     ports:
       - "15432:5432"
     volumes:
@@ -60,7 +62,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      REPLICA_DELAY: 20s
+      REPLICA_DELAY: 30s
+      TZ: Europe/Madrid
+      PGTZ: Europe/Madrid
     ports:
       - "25432:5432"
     volumes:
