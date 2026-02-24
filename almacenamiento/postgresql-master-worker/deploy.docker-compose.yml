@@ -17,16 +17,6 @@ services:
       - |
         set -eu
 
-        echo "Waiting for fetched primary init files..."
-        for i in $(seq 1 120); do
-          if [ -f /docker-entrypoint-initdb.d/01-replication.sql ] && \
-             [ -f /docker-entrypoint-initdb.d/02-hba.sh ] && \
-             [ -f /docker-entrypoint-initdb.d/10-init.sql ]; then
-            break
-          fi
-          sleep 1
-        done
-
         chmod +x /docker-entrypoint-initdb.d/02-hba.sh || true
 
         exec docker-entrypoint.sh postgres \
@@ -57,14 +47,6 @@ services:
       - |
         set -eu
 
-        echo "Waiting for fetched replica script..."
-        for i in $(seq 1 120); do
-          if [ -f /replica-init/replica-entrypoint.sh ]; then
-            break
-          fi
-          sleep 1
-        done
-
         chmod +x /replica-init/replica-entrypoint.sh || true
         exec /replica-init/replica-entrypoint.sh
 
@@ -87,15 +69,6 @@ services:
       - -lc
       - |
         set -eu
-
-        echo "Waiting for fetched replica script..."
-        for i in $(seq 1 120); do
-          if [ -f /replica-init/replica-entrypoint.sh ]; then
-            break
-          fi
-          sleep 1
-        done
-
         chmod +x /replica-init/replica-entrypoint.sh || true
         exec /replica-init/replica-entrypoint.sh
 
