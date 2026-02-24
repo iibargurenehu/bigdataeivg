@@ -27,6 +27,8 @@ services:
           -c hot_standby=on
           -c log_min_messages=info
           -c log_replication_commands=on
+          -c log_connections=on
+          -c log_min_messages=info
 
 
   replica1:
