@@ -28,4 +28,4 @@ if [ ! -s "$PGDATA/PG_VERSION" ]; then
 fi
 
 # Arranca Postgres usando el entrypoint oficial (baja a usuario postgres)
-exec docker-entrypoint.sh postgres
+exec docker-entrypoint.sh postgres -c log_min_messages=info
