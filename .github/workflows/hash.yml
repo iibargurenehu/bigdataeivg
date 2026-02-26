@@ -1,0 +1,175 @@
+name: Sync sha256 sidecar files
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync .sha256 files
+        id: sync
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t files < <(
+            git ls-files | grep -Ev '(^|/)\.'
+          )
+
+          declare -A tracked
+          for f in "${files[@]}"; do
+            tracked["$f"]=1
+          done
+
+          created=()
+          updated=()
+          deleted=()
+
+          sha_for_file() {
+            local file="$1"
+            sha256sum "$file" | awk '{print $1}'
+          }
+
+          # 1) Create / update sidecars
+          for f in "${files[@]}"; do
+            [[ "$f" == *.sha256 ]] && continue
+            [[ -f "$f" ]] || continue
+
+            sidecar="${f}.sha256"
+            sum="$(sha_for_file "$f")"
+
+            if [[ ! -f "$sidecar" ]]; then
+              printf "%s\n" "$sum" > "$sidecar"
+              created+=("$sidecar")
+              continue
+            fi
+
+            current="$(awk '{print $1}' "$sidecar" | head -n 1 || true)"
+            if [[ "$current" != "$sum" ]]; then
+              printf "%s\n" "$sum" > "$sidecar"
+              updated+=("$sidecar")
+            fi
+          done
+
+          # 2) Delete orphan sidecars
+          for f in "${files[@]}"; do
+            [[ "$f" != *.sha256 ]] && continue
+            base="${f%.sha256}"
+
+            if [[ -z "${tracked["$base"]+x}" ]] || [[ ! -f "$base" ]]; then
+              git rm -f -- "$f"
+              deleted+=("$f")
+            fi
+          done
+
+          # Add changes
+          if (( ${#created[@]} > 0 || ${#updated[@]} > 0 )); then
+            git add -A
+          fi
+
+          # Helper: group-by-folder + sort
+          format_grouped() {
+            awk '
+              function dirname(p,   i,s) {
+                i = match(p, /\/[^\/]*$/)
+                if (i==0) return "(root)"
+                s = substr(p, 1, i-1)
+                return (s=="" ? "(root)" : s)
+              }
+              function basename(p,   i) {
+                i = match(p, /\/[^\/]*$/)
+                return (i==0 ? p : substr(p, i+1))
+              }
+              { d = dirname($0); b = basename($0); print d "\t" b }
+            ' | sort -t $'\t' -k1,1 -k2,2 | awk -F'\t' '
+              $1 != prev {
+                if (NR>1) print ""
+                print $1 ":"
+                prev=$1
+              }
+              { print "  - " $2 }
+            '
+          }
+
+          created_grouped="$(printf "%s\n" "${created[@]}" | format_grouped || true)"
+          updated_grouped="$(printf "%s\n" "${updated[@]}" | format_grouped || true)"
+          deleted_grouped="$(printf "%s\n" "${deleted[@]}" | format_grouped || true)"
+
+          {
+            echo "created_count=${#created[@]}"
+            echo "updated_count=${#updated[@]}"
+            echo "deleted_count=${#deleted[@]}"
+            echo "created_grouped<<EOF"
+            printf "%s\n" "$created_grouped"
+            echo "EOF"
+            echo "updated_grouped<<EOF"
+            printf "%s\n" "$updated_grouped"
+            echo "EOF"
+            echo "deleted_grouped<<EOF"
+            printf "%s\n" "$deleted_grouped"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push if changed
+        shell: bash
+        env:
+          CREATED_COUNT: ${{ steps.sync.outputs.created_count }}
+          UPDATED_COUNT: ${{ steps.sync.outputs.updated_count }}
+          DELETED_COUNT: ${{ steps.sync.outputs.deleted_count }}
+          CREATED_GROUPED: ${{ steps.sync.outputs.created_grouped }}
+          UPDATED_GROUPED: ${{ steps.sync.outputs.updated_grouped }}
+          DELETED_GROUPED: ${{ steps.sync.outputs.deleted_grouped }}
+        run: |
+          set -euo pipefail
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          commit_msg="chore: sync sha256 sidecar files
+
+          Summary:
+          - Created: ${CREATED_COUNT}
+          - Updated: ${UPDATED_COUNT}
+          - Deleted: ${DELETED_COUNT}"
+          
+                    if [[ -n "${CREATED_GROUPED}" ]]; then
+                      commit_msg="${commit_msg}
+          
+          Created:
+          ${CREATED_GROUPED}"
+                    fi
+          
+                    if [[ -n "${UPDATED_GROUPED}" ]]; then
+                      commit_msg="${commit_msg}
+          
+          Updated:
+          ${UPDATED_GROUPED}"
+                    fi
+          
+                    if [[ -n "${DELETED_GROUPED}" ]]; then
+                      commit_msg="${commit_msg}
+          
+          Deleted:
+          ${DELETED_GROUPED}"
+                    fi
+
+          git commit -m "$commit_msg"
+          git push
