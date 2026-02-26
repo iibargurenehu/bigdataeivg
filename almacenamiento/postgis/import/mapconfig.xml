@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <tag_name name="highway"/>
+  <tag_name name="name"/>
+
+  <class id="1" name="motorway" />
+  <class id="2" name="trunk" />
+  <class id="3" name="primary" />
+  <class id="4" name="secondary" />
+  <class id="5" name="tertiary" />
+  <class id="6" name="unclassified" />
+  <class id="7" name="residential" />
+  <class id="8" name="service" />
+
+  <type id="1" name="motorway" class_id="1" />
+  <type id="2" name="trunk" class_id="2" />
+  <type id="3" name="primary" class_id="3" />
+  <type id="4" name="secondary" class_id="4" />
+  <type id="5" name="tertiary" class_id="5" />
+  <type id="6" name="unclassified" class_id="6" />
+  <type id="7" name="residential" class_id="7" />
+  <type id="8" name="service" class_id="8" />
+
+  <rule tag="highway" value="motorway" type_id="1" />
+  <rule tag="highway" value="trunk" type_id="2" />
+  <rule tag="highway" value="primary" type_id="3" />
+  <rule tag="highway" value="secondary" type_id="4" />
+  <rule tag="highway" value="tertiary" type_id="5" />
+  <rule tag="highway" value="unclassified" type_id="6" />
+  <rule tag="highway" value="residential" type_id="7" />
+  <rule tag="highway" value="service" type_id="8" />
+</configuration>
