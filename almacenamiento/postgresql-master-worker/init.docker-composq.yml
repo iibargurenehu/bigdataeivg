@@ -1,0 +1,47 @@
+version: "3.3"
+
+services:
+  inicializador:
+    image: alpine:3.19
+    container_name: pg-inicializador
+    environment:
+      - PRIMARY_REPLICATION_SQL_URL=https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/main/almacenamiento/postgresql-master-worker/01-replication.sql
+      - PRIMARY_HBA_SH_URL=https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/main/almacenamiento/postgresql-master-worker/02-hba.sh
+      - INIT_SQL_URL=https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/main/almacenamiento/postgresql-master-worker/10-database-initial-import.sql
+      - REPLICA_ENTRYPOINT_SH_URL=https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/main/almacenamiento/postgresql-master-worker/replica-entrypoint.sh
+
+    volumes:
+      - primary_init:/out/primary-init
+      - replica_init:/out/replica-init
+
+    command: |
+      sh -c 'set -eux
+      apk add --no-cache curl ca-certificates bash
+      echo URLs
+      echo PRIMARY_REPLICATION_SQL_URL=[$$PRIMARY_REPLICATION_SQL_URL]
+      echo PRIMARY_HBA_SH_URL=[$$PRIMARY_HBA_SH_URL]
+      echo INIT_SQL_URL=[$$INIT_SQL_URL]
+      echo REPLICA_ENTRYPOINT_SH_URL=[$$REPLICA_ENTRYPOINT_SH_URL]
+      echo Downloading primary init files
+      mkdir -p /out/primary-init
+      curl -fSL "$$PRIMARY_REPLICATION_SQL_URL" -o /out/primary-init/01-replication.sql
+      curl -fSL "$$PRIMARY_HBA_SH_URL" -o /out/primary-init/02-hba.sh
+      curl -fSL "$$INIT_SQL_URL" -o /out/primary-init/10-init.sql
+      echo Downloading replica init files
+      mkdir -p /out/replica-init
+      curl -fSL "$$REPLICA_ENTRYPOINT_SH_URL" -o /out/replica-init/replica-entrypoint.sh
+      echo Fixing permissions
+      chmod +x /out/primary-init/02-hba.sh
+      chmod +x /out/replica-init/replica-entrypoint.sh
+      echo Listing downloaded files
+      ls -la /out/primary-init
+      ls -la /out/replica-init
+      echo Initializer done
+      '
+
+
+volumes:
+  primary_init:
+    name: postgresql-master-worker_primary_init
+  replica_init:
+    name: postgresql-master-worker_replica_init
