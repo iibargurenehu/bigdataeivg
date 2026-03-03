@@ -1,0 +1,33 @@
+version: '3.3'
+services:
+  import_osm:
+    image: pgrouting/pgrouting-extra:16-3.5-4.0
+    container_name: pgr_import_osm
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGDATABASE: gis
+      PGUSER: postgis
+      PGPASSWORD: postgis
+      OSM_PBF_URL: "https://download.geofabrik.de/europe/spain/pais-vasco-latest.osm.pbf"
+      OSM_PBF_FILE: "/work/pais-vasco-latest.osm.pbf"
+      OSM2PGROUTING_CONF: "/work/mapconfig.xml"
+    volumes:
+      - pg_initdb:/work
+    entrypoint: ["/bin/sh", "/work/import.sh"]
+    restart: "no"
+    networks:
+      - big-data
+
+
+volumes:
+  pg_initdb:
+    external: true
+    name: pg_initdb
+
+networks:
+  big-data:
+    external: true
