@@ -7,7 +7,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      PGHOST: db
+      PGHOST: postgis
       PGPORT: "5432"
       PGDATABASE: gis
       PGUSER: postgis
