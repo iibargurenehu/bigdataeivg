@@ -1,0 +1,32 @@
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:00:00Z',20.10,45.20,3.02,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:05:00Z',20.30,45.80,3.02,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:10:00Z',20.50,46.10,3.01,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:15:00Z',20.70,46.50,3.01,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:20:00Z',20.90,47.00,3.00,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:25:00Z',21.10,47.30,3.00,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:30:00Z',21.40,47.80,2.99,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:35:00Z',21.60,48.10,2.99,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:40:00Z',21.80,48.50,2.98,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:45:00Z',22.00,49.00,2.98,'vitoria-lab');
+
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:50:00Z',22.20,49.30,2.97,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T08:55:00Z',22.40,49.70,2.97,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:00:00Z',22.60,50.10,2.96,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:05:00Z',22.80,50.40,2.96,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:10:00Z',23.00,50.80,2.95,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:15:00Z',23.20,51.10,2.95,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:20:00Z',23.40,51.50,2.94,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:25:00Z',23.60,51.90,2.94,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:30:00Z',23.80,52.20,2.93,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:35:00Z',24.00,52.60,2.93,'vitoria-lab');
+
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:40:00Z',24.10,53.00,2.92,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:45:00Z',24.20,53.30,2.92,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:50:00Z',24.30,53.70,2.91,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T09:55:00Z',24.40,54.00,2.91,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T10:00:00Z',24.50,54.30,2.90,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T10:05:00Z',24.60,54.70,2.90,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T10:10:00Z',24.70,55.00,2.89,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T10:15:00Z',24.80,55.40,2.89,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T10:20:00Z',24.90,55.70,2.88,'vitoria-lab');
+INSERT INTO iot.readings_by_device_day (device_id, day, ts, temperature_c, humidity_pct, battery_v, location) VALUES ('sensor-001','2026-03-03','2026-03-03T10:25:00Z',25.00,56.00,2.88,'vitoria-lab');
