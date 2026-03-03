@@ -22,6 +22,7 @@ osm2pgrouting \
   --host "$PGHOST" \
   --port "$PGPORT" \
   --username "$PGUSER" \
+  --password "$PGPASSWORD"
   --clean
 
 echo "[import] post steps..."
