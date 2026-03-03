@@ -1,0 +1,30 @@
+version: "3.3"
+
+services:
+  init-volumes:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest   # <-- sustituye por tu imagen real
+    container_name: init-postgis-volumes
+    environment:
+      URLS: "EXTENSIONS,IMPORT_SH,MAPCONFIG"
+      IGNORE_HASHES: "none"
+
+      INIT_EXTENSIONS_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/almacenamiento/postgis/initdb/00-extensions.sql"
+      INIT_EXTENSIONS_PATH: "/docker-entrypoint-initdb.d/00-extensions.sql"
+
+      INIT_IMPORT_SH_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/almacenamiento/postgis/import/import.sh"
+      INIT_IMPORT_SH_PATH: "/work/import.sh"
+
+      INIT_MAPCONFIG_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/almacenamiento/postgis/import/mapconfig.xml"
+      INIT_MAPCONFIG_PATH: "/work/mapconfig.xml"
+
+    volumes:
+      - pg_initdb:/docker-entrypoint-initdb.d
+      - pg_work:/work
+
+    restart: "no"
+
+volumes:
+  pg_initdb:
+    name: pg_initdb
+  pg_work:
+    name: pg_work
