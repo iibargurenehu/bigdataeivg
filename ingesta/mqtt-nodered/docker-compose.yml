@@ -1,0 +1,55 @@
+version: "3.3"
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.1-alpine
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+#      - "1883:1883"
+      - "9001:9001"
+    environment:
+      - TZ=Europe/Madrid
+    volumes:
+      - mosquitto-data:/mosquitto
+    networks:
+      - big-data
+
+  node-red:
+    image: nodered/node-red:4.1.7-22-minimal
+    container_name: node-red
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    environment:
+      - TZ=Europe/Madrid
+    volumes:
+      - nodered-data:/data
+    depends_on:
+      - mosquitto
+    networks:
+      - big-data
+
+  mqttx:
+    image: emqx/mqttx-web:v1.13.0
+    container_name: mqttx
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Madrid
+    ports:
+      - "8080:80"
+    depends_on:
+      - mosquitto
+    networks:
+      - big-data
+
+networks:
+  big-data:
+    name: big-data
+    external: true
+
+volumes:
+  mosquitto-data:
+    name: mosquitto-data
+  nodered-data:
+    name: nodered-data
