@@ -1,0 +1,154 @@
+services:
+  cassandra:
+    image: cassandra:3.11.19
+    container_name: cassandra
+    hostname: cassandra
+    restart: unless-stopped
+    ports:
+      - 49042:9042
+    environment:
+      - CASSANDRA_SEEDS=cassandra
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - TZ=Europe/Madrid
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+       - big-data
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status | grep -q \"UN\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+       
+  cassandra-download-files:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest 
+    container_name:  cassandra-download-files
+    hostname: cassandra-download-files
+    restart: no
+    environment:
+      URLS: "SCHEMA,DATA"
+      INIT_SCHEMA_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/almacenamiento/cassandra3/create_schema.cql"
+      INIT_SCHEMA_PATH: "/cassandra_inserts/schema.cql"
+      INIT_DATA_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/almacenamiento/cassandra3/readings_by_device_day.inserts.cql"
+      INIT_DATA_PATH: "/cassandra_inserts/data.cql"
+    volumes:
+      - cassandra_inserts:/cassandra_inserts
+    depends_on:
+      cassandra:
+        condition: service_healthy
+  cassandra-insert:
+    image: cassandra:3.11.19
+    container_name: cassandra-insert
+    hostname: cassandra-insert
+    restart: no
+    volumes:
+      - cassandra_inserts:/cassandra_inserts
+    #command: cqlsh cassandra < /cassandra_inserts/schema.cql && cqlsh cassandra < /cassandra_inserts/data.cql && rm /cassandra_inserts/*.cql
+    command: sleep 300000
+    networks:
+       - big-data
+    depends_on:
+      cassandra-download-files:
+        condition: service_completed_successfully
+  postgresql-download-files:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest
+    container_name: postgresql-download-files
+    hostname: postgresql-download-files
+    restart: no
+    volumes:
+      - postgres_init:/docker-entrypoint-initdb.d
+    environment:
+      URLS: "IMPORT"
+      INIT_IMPORT_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/almacenamiento/postgresql-master-worker/10-database-initial-import.sql"
+      INIT_IMPORT_PATH: "/docker-entrypoint-initdb.d/10-database-initial-import.sql"
+  postgres:
+    image: postgres:16-alpine3.23
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: Europe/Madrid
+      PGTZ: Europe/Madrid
+    ports:
+      - "45432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_init:/docker-entrypoint-initdb.d
+    networks:
+      - big-data
+    depends_on:
+      postgresql-download-files:
+        condition: service_completed_successfully
+  mosquitto-download-files:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest
+    container_name: mosquitto-download-files
+    hostname: mosquitto-download-files
+    restart: no
+    volumes:
+      - mosquitto_data:/mosquitto
+    environment:
+      URLS: "MOSQUITTO"
+      INIT_MOSQUITTO_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/ingesta/mqtt-nodered/mosquitto/mosquitto.conf"
+      INIT_MOSQUITTO_PATH: "/mosquitto/config/mosquitto.conf"
+  mosquitto:
+    image: eclipse-mosquitto:2.1-alpine
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    environment:
+      - TZ=Europe/Madrid
+    volumes:
+      - mosquitto_data:/mosquitto
+    networks:
+      - big-data
+    depends_on:
+      mosquitto-download-files:
+        condition: service_completed_successfully
+
+  node-red:
+    image: nodered/node-red:4.1.7-22-minimal
+    container_name: node-red
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    environment:
+      - TZ=Europe/Madrid
+    volumes:
+      - nodered_data:/data
+    depends_on:
+      - mosquitto
+    networks:
+      - big-data
+
+  mqttx:
+    image: emqx/mqttx-web:v1.13.0
+    container_name: mqttx
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Madrid
+    ports:
+      - "8080:80"
+    depends_on:
+      - mosquitto
+    networks:
+      - big-data
+
+      
+volumes:
+  cassandra_data:
+    name: cassandra_data
+  cassandra_inserts:
+    name: cassandra_inserts-temp
+  postgres_init:
+    name: postgres_init-temp
+  postgres_data:
+    name: postgres_data
+  mosquitto_data:
+    name: mosquitto_data
+  nodered_data:
+    name: nodered-data
+networks:
+  big-data:
+    external: true
