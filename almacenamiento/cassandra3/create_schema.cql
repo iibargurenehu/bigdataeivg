@@ -1,5 +1,7 @@
 CREATE KEYSPACE iot WITH replication = {'class' : 'SimpleStrategy', 'replication_factor': 1};
 
+use iot;
+
 create table readings_by_device_day
 (
     device_id     text,
