@@ -1,0 +1,52 @@
+version: "3.3"
+
+services:
+  pgrouting-download-init-files:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest 
+    container_name:  pgrouting-download-init-files
+    hostname: pgrouting-download-init-files
+    restart: no
+    environment:
+      URLS: "INIT"
+      INIT_INIT_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/vgbusinessmap/01.init.sql"
+      INIT_INIT_PATH: "/pgrouting_init/01.init.sql"
+    volumes:
+      - pgrouting_init:/pgrouting_init
+
+  pgrouting:
+    image: pgrouting/pgrouting:16-3.5-4.0
+    container_name: pgrouting
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gis
+      POSTGRES_USER: gis
+      POSTGRES_PASSWORD: gis
+      TZ: Europe/Madrid
+      PGTZ: Europe/Madrid
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgrouting_data:/var/lib/postgresql/data
+      - pgrouting_init:/docker-entrypoint-initdb.d
+      - pgrouting_import:/import
+    networks:
+      - big-data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gis -d gis"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      cassandra-download-files:
+        condition: pgrouting-download-init-files
+
+volumes:
+  pgrouting_data:
+    name: pgrouting_data
+  pgrouting_init:
+    name: pgrouting_init
+    
+networks:
+  big-data:
+    external: true
+
