@@ -28,7 +28,6 @@ services:
     volumes:
       - pgrouting_data:/var/lib/postgresql/data
       - pgrouting_init:/docker-entrypoint-initdb.d
-      - pgrouting_import:/import
     networks:
       - big-data
     healthcheck:
@@ -37,8 +36,8 @@ services:
       timeout: 5s
       retries: 10
     depends_on:
-      cassandra-download-files:
-        condition: pgrouting-download-init-files
+      pgrouting-download-init-files:
+        condition: service_completed_successfully
 
 volumes:
   pgrouting_data:
@@ -49,4 +48,3 @@ volumes:
 networks:
   big-data:
     external: true
-
