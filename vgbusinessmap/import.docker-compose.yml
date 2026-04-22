@@ -1,0 +1,42 @@
+services:
+  pgrouting-download-data-files:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest 
+    container_name:  pgrouting-download-data-files
+    hostname: pgrouting-download-data-files
+    restart: no
+    environment:
+      URLS: "MAPCONFIG,DATA"
+      INIT_MAPCONFIG_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/vgbusinessmap/mapconfig.xml"
+      INIT_MAPCONFIG_PATH: "/pgrouting_import/mapconfig.xml"
+      INIT_DATA_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/vgbusinessmap/vitoria_final.osm"
+      INIT_DATA_PATH: "/pgrouting_import/vitoria_final.osm"
+    volumes:
+      - pgrouting_init:/pgrouting_init
+      - pgrouting_import:/pgrouting_import
+    
+  osm2pgsql:
+    image: iboates/osm2pgsql:latest
+    container_name: osm2pgsql
+    volumes:
+      - pgrouting_import:/data
+    networks:
+      - big-data
+    command: osm2pgsql -H pgrouting -P 5432 -U gis -d gis --create --slim --hstore /data/vitoria_final.osm
+
+  osm2pgrouting:
+    image: iboates/osm2pgrouting:latest
+    container_name: osm2pgrouting
+    volumes:
+      - pgrouting_import:/data
+    networks:
+      - big-data
+    command: osm2pgrouting --file /data/vitoria_final.osm   --conf /data/mapconfig.xml --dbname gis --host pgrouting --port 5432 --username gis --password gis --clean
+    
+
+volumes:
+  pgrouting_import:
+    name: pgrouting_import
+networks:
+  big-data:
+    external: true
+
