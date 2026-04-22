@@ -11,7 +11,6 @@ services:
       INIT_DATA_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/vgbusinessmap/vitoria_final.osm"
       INIT_DATA_PATH: "/pgrouting_import/vitoria_final.osm"
     volumes:
-      - pgrouting_init:/pgrouting_init
       - pgrouting_import:/pgrouting_import
     
   osm2pgsql:
@@ -21,7 +20,12 @@ services:
       - pgrouting_import:/data
     networks:
       - big-data
+    environment:
+      PGPASSWORD: gis
     command: osm2pgsql -H pgrouting -P 5432 -U gis -d gis --create --slim --hstore /data/vitoria_final.osm
+    depends_on:
+      pgrouting-download-data-files:
+        condition: service_completed_successfully
 
   osm2pgrouting:
     image: iboates/osm2pgrouting:latest
@@ -31,7 +35,9 @@ services:
     networks:
       - big-data
     command: osm2pgrouting --file /data/vitoria_final.osm   --conf /data/mapconfig.xml --dbname gis --host pgrouting --port 5432 --username gis --password gis --clean
-    
+    depends_on:
+      pgrouting-download-data-files:
+        condition: service_completed_successfully
 
 volumes:
   pgrouting_import:
@@ -39,4 +45,3 @@ volumes:
 networks:
   big-data:
     external: true
-
