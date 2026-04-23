@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  download-pyspark-jars:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest   # <-- sustituye por tu imagen real
+    container_name: download-pyspark-jars
+    environment:
+      URLS: "MQTT"
+    
+      INIT_MQTT_URL: "https://github.com/iibargurenehu/bigdataeivg/raw/refs/heads/main/spark3_5_0-scala2_12-mqtt-1.0.0.jar"
+      INIT_MQTT_PATH: "/jars/spark3_5_0-scala2_12-mqtt-1.0.0.jar"
+    volumes:
+      - spark_jars:/jars
+volumes:
+  spark_jars:
+    name: spark_jars
