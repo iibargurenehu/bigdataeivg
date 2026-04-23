@@ -16,6 +16,7 @@ services:
         --jars /home/jovyan/jars/spark3_5_0-scala2_12-mqtt-1.0.0.jar
         --driver-class-path /home/jovyan/jars/spark3_5_0-scala2_12-mqtt-1.0.0.jar
         --conf spark.executor.extraClassPath=/home/jovyan/jars/spark3_5_0-scala2_12-mqtt-1.0.0.jar
+        --packages org.postgresql:postgresql:42.7.7,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1
         pyspark-shell
     networks:
       - big-data
