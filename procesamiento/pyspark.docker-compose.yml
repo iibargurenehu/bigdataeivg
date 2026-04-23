@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  spark-notebook:
+    image: jupyter/pyspark-notebook:latest
+    container_name: spark-pyspark-notebook
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    volumes:
+      - spark_data:/home/jovyan/work
+      - spark_jars:/home/jovyan/jars
+    environment:
+      JUPYTER_TOKEN: "bigdata"
+      SPARK_MASTER: "local[*]"
+      PYSPARK_SUBMIT_ARGS: >-
+        --jars /home/jovyan/jars/spark3_5_0-scala2_12-mqtt-1.0.0.jar
+        --driver-class-path /home/jovyan/jars/spark3_5_0-scala2_12-mqtt-1.0.0.jar
+        --conf spark.executor.extraClassPath=/home/jovyan/jars/spark3_5_0-scala2_12-mqtt-1.0.0.jar
+        pyspark-shell
+    networks:
+      - big-data
+
+    restart: unless-stopped
+volumes:
+  spark_data:
+    name: spark_data
+  spark_jars:
+    name: spark_jars
+
+networks:
+  big-data:
+    external: true
