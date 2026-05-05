@@ -13,10 +13,36 @@ services:
       - grafana_data:/var/lib/grafana
     networks:
       - big-data
-      
+  download-files-music:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest 
+    container_name:  download-files-music
+    hostname: download-files-music
+    restart: no
+    environment:
+      URLS: "MUSIC"
+      INIT_MUSIC_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/visualizacion/music_2026-05-05_100243_create_inserts.sql"
+      INIT_MUSIC_PATH: "/postgres-inserts/music.sql"
+    volumes:
+      - music_files:/postgres-inserts/
+  insert-music-data:
+    image: postgres:16-alpine3.23
+    container_name: insert-music-data
+    restart: no
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    volumes:
+      - music_files:/postgres-inserts/
+    networks:
+      - big-data
+    command: psql -h primary --password postgres < /postgres-inserts/music.sql
+    #command: sleep 10000
+
 volumes:
   grafana_data:
     name: grafana_data
+  music_files:
+    name: music_files
 networks:
   big-data:
     external: true
