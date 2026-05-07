@@ -1,6 +1,8 @@
 -- PostgreSQL script converted from pg_dump COPY to INSERT statements
 -- Includes database/schema creation
 
+DROP DATABASE IF EXISTS music;
+
 CREATE DATABASE music;
 \connect music
 
