@@ -8,7 +8,8 @@ services:
     environment:
       - TZ=Europe/Madrid
       #- GF_PLUGINS_PREINSTALL=grafana-clock-panel
-      - GF_SECURITY_ADMIN_PASSWORD=“adminadminadmin”
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=adminadminadmin
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
