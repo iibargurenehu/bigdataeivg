@@ -1,0 +1,31 @@
+services:
+  download-crypto-files:
+    image: ghcr.io/iibargurenehu/inicializador-volumenes:latest 
+    restart: no
+    environment:
+      URLS: "DATA"
+      INIT_DATA_URL: "https://raw.githubusercontent.com/iibargurenehu/bigdataeivg/refs/heads/main/final/crypto.sql"
+      INIT_DATA_PATH: "/postgres_crypto_import/crypto.sql"
+    volumes:
+      - postgres_crypto_import:/postgres_crypto_import
+  psql:
+    image: alpine/psql:16.3 
+    restart: no
+    command:
+      - "postgresql://gis:gis@pgrouting:5432"
+      - -f
+      - /postgres_crypto_import/crypto.sql
+    depends_on:
+      download-crypto-files:
+        condition: service_completed_successfully
+    networks:
+      - big-data
+    volumes:
+      - postgres_crypto_import:/postgres_crypto_import
+        
+volumes:
+  postgres_crypto_import:
+    name: postgres_crypto_import
+networks:
+  big-data:
+    external: true
