@@ -1,0 +1,23 @@
+grafana:
+    image: grafana/grafana:13.0
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - TZ=Europe/Madrid
+      #- GF_PLUGINS_PREINSTALL=grafana-clock-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - big-data
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=“adminadminadmin”
+
+     
+volumes:
+  grafana_data:
+    name: grafana_data
+networks:
+  big-data:
+    external: true
