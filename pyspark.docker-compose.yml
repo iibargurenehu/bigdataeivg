@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+  spark-notebook:
+    image: jupyter/pyspark-notebook:latest
+    container_name: spark-pyspark-notebook
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    volumes:
+      - spark_data:/home/jovyan/work
+    environment:
+      JUPYTER_TOKEN: "bigdata"
+      SPARK_MASTER: "local[*]"
+      PYSPARK_SUBMIT_ARGS: >-
+        --packages org.postgresql:postgresql:42.7.7
+        pyspark-shell
+    restart: unless-stopped
+    networks:
+      - big-data
+volumes:
+  spark_data:
+    name: spark_data
+
+networks:
+  big-data:
+    external: true
