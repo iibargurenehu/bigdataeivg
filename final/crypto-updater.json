@@ -1,0 +1,323 @@
+[
+    {
+        "id": "08b3f87f79969a2c",
+        "type": "tab",
+        "label": "Updater",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0b4a55bc407784a5",
+        "type": "inject",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 80,
+        "wires": [
+            [
+                "eb02d457caa3334c"
+            ]
+        ]
+    },
+    {
+        "id": "eb02d457caa3334c",
+        "type": "postgresql",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "query": "SELECT id FROM trades;",
+        "postgreSQLConfig": "5749e7612fd4159c",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 310,
+        "y": 40,
+        "wires": [
+            [
+                "57887b706e98404a"
+            ]
+        ]
+    },
+    {
+        "id": "313a081587e0718a",
+        "type": "debug",
+        "z": "08b3f87f79969a2c",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "42169c584ed7984a",
+        "type": "http request",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://141.253.196.53/api/trades",
+        "tls": "a506b6d13a907857",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": true,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 650,
+        "y": 180,
+        "wires": [
+            [
+                "075b6d6584071706",
+                "dcf2c5a1a8b986f2"
+            ]
+        ]
+    },
+    {
+        "id": "075b6d6584071706",
+        "type": "json",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 810,
+        "y": 80,
+        "wires": [
+            [
+                "73b2e85bb23b736b"
+            ]
+        ]
+    },
+    {
+        "id": "73b2e85bb23b736b",
+        "type": "change",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "len",
+                "pt": "msg",
+                "to": "$length($string(msg.payload))",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$map(msg.payload, function($tupla){\t    \"INSERT INTO trades(id, symbol, time, price, qty, buy) VALUES(\" & $tupla.id & \", '\" & $tupla.symbol & \"', '\" & $tupla.time & \"', \" & $tupla.price & \", \" & $tupla.qty & \", \" & $tupla.buy & \") ON CONFLICT(symbol, time) DO NOTHING\" \t})",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "query",
+                "pt": "msg",
+                "to": "\"BEGIN;\\n\" & $reduce(msg.payload, function($i, $j){     $i & \";\\n\" & $j }) & \";\\nCOMMIT;\\n\"",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1000,
+        "y": 80,
+        "wires": [
+            [
+                "313a081587e0718a",
+                "ae800a071193f284"
+            ]
+        ]
+    },
+    {
+        "id": "ae800a071193f284",
+        "type": "postgresql",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "query": "",
+        "postgreSQLConfig": "5749e7612fd4159c",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 1230,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dcf2c5a1a8b986f2",
+        "type": "debug",
+        "z": "08b3f87f79969a2c",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 920,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "caff433467c00898",
+        "type": "change",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$map(msg.payload, function($i) {$i.id})",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 240,
+        "wires": [
+            [
+                "dcf2c5a1a8b986f2",
+                "42169c584ed7984a"
+            ]
+        ]
+    },
+    {
+        "id": "57887b706e98404a",
+        "type": "switch",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "property": "pgsql.rowCount",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 90,
+        "y": 240,
+        "wires": [
+            [
+                "cf905d47c263e72c"
+            ],
+            [
+                "caff433467c00898"
+            ]
+        ]
+    },
+    {
+        "id": "cf905d47c263e72c",
+        "type": "change",
+        "z": "08b3f87f79969a2c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[{\"id\" : -1}]",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 240,
+        "y": 180,
+        "wires": [
+            [
+                "caff433467c00898"
+            ]
+        ]
+    },
+    {
+        "id": "5749e7612fd4159c",
+        "type": "postgreSQLConfig",
+        "name": "",
+        "host": "postgres",
+        "hostFieldType": "str",
+        "port": 5432,
+        "portFieldType": "num",
+        "database": "crypto",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": 10,
+        "maxFieldType": "num",
+        "idle": 1000,
+        "idleFieldType": "num",
+        "connectionTimeout": 10000,
+        "connectionTimeoutFieldType": "num",
+        "user": "postgres",
+        "userFieldType": "str",
+        "password": "postgres",
+        "passwordFieldType": "str"
+    },
+    {
+        "id": "a506b6d13a907857",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": false,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "6495c55d103ef845",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-postgresql": "0.15.4"
+        }
+    }
+]
