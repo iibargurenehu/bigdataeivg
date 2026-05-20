@@ -9,7 +9,8 @@ services:
     volumes:
       - postgres_crypto_import:/postgres_crypto_import
   psql:
-    image: alpine/psql:16.3 
+    image: alpine/psql:16.3
+    container_name: psql
     restart: no
     command:
       - "postgresql://gis:gis@pgrouting:5432"
